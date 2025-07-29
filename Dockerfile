@@ -30,6 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar código da aplicação
 COPY servidor_parcerias_mcp.py .
 COPY env.example .
+COPY .env .
 
 # Criar diretório para logs e dados
 RUN mkdir -p /app/logs && chown -R mcpuser:mcpuser /app

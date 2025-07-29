@@ -30,8 +30,8 @@ ENV/
 env.bak/
 venv.bak/
 
-# Environment files (sensitive data)
-.env
+# Environment files (sensitive data) - .env is needed for container
+# .env
 .env.local
 .env.development.local
 .env.test.local
