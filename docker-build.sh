@@ -94,7 +94,7 @@ run_container() {
     docker run -d \
         --name ${CONTAINER_NAME} \
         --env-file .env \
-        -p 8080:8080 \
+        -p 3000:3000 \
         --restart unless-stopped \
         ${IMAGE_NAME}:${TAG}
     

@@ -27,7 +27,7 @@ nano .env
 
 # Ou usar comandos Docker diretamente
 docker build -t serena-mcp-server .
-docker run -d --name serena-mcp-server --env-file .env -p 8080:8080 serena-mcp-server
+docker run -d --name serena-mcp-server --env-file .env -p 3000:3000 serena-mcp-server
 ```
 
 ## 🛠️ **Métodos de Execução**
@@ -85,7 +85,7 @@ docker build -t serena-mcp-server .
 docker run -d \
   --name serena-mcp-server \
   --env-file .env \
-  -p 8080:8080 \
+  -p 3000:3000 \
   --restart unless-stopped \
   serena-mcp-server
 
@@ -113,8 +113,8 @@ PARTNERSHIP_API_ENDPOINT=https://partnership-service-staging.api.srna.co/
 
 ### **Portas**
 
-- **8080**: Porta padrão para debugging (se necessário)
-- **8081**: Porta para desenvolvimento (docker-compose dev)
+- **3000**: Porta padrão para debugging (se necessário)
+- **3001**: Porta para desenvolvimento (docker-compose dev)
 
 ### **Volumes**
 

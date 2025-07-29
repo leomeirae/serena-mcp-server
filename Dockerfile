@@ -38,11 +38,11 @@ RUN mkdir -p /app/logs && chown -R mcpuser:mcpuser /app
 USER mcpuser
 
 # Expor porta (se necessário para debugging)
-EXPOSE 8080
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+    CMD curl -f http://localhost:3000/health || exit 1
 
 # Comando padrão
 CMD ["python", "servidor_parcerias_mcp.py"]
