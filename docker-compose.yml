@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  serena-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: serena-mcp-server
+    restart: unless-stopped
+    environment:
+      # Configurações da API (substitua pelos valores reais)
+      - PARTNERSHIP_API_KEY=${PARTNERSHIP_API_KEY}
+      - PARTNERSHIP_API_ENDPOINT=${PARTNERSHIP_API_ENDPOINT:-https://partnership-service-staging.api.srna.co}
+    env_file:
+      - .env
+    volumes:
+      # Volume para logs (opcional)
+      - ./logs:/app/logs
+    ports:
+      # Porta para debugging (se necessário)
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mcp-network
+
+  # Serviço opcional para desenvolvimento
+  serena-mcp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: serena-mcp-server-dev
+    restart: unless-stopped
+    environment:
+      - PARTNERSHIP_API_KEY=${PARTNERSHIP_API_KEY}
+      - PARTNERSHIP_API_ENDPOINT=${PARTNERSHIP_API_ENDPOINT:-https://partnership-service-staging.api.srna.co}
+      - PYTHONPATH=/app
+    env_file:
+      - .env
+    volumes:
+      # Volume para desenvolvimento (código montado)
+      - ./servidor_parcerias_mcp.py:/app/servidor_parcerias_mcp.py
+      - ./requirements.txt:/app/requirements.txt
+      - ./logs:/app/logs
+    ports:
+      - "8001:8000"
+    command: ["python", "-u", "servidor_parcerias_mcp.py"]
+    profiles:
+      - dev
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+    name: serena-mcp-network 
