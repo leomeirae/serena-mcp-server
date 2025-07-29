@@ -307,11 +307,36 @@ if __name__ == "__main__":
         print(f"DEBUG: Server object created: {server}")
         print(f"DEBUG: Server name: {server.name}")
         print(f"DEBUG: Server instructions: {server.instructions}")
-        print("DEBUG: Starting server.run()...")
+        
+        # Verificar se há conexão stdio disponível
+        import sys
+        print(f"DEBUG: stdin: {sys.stdin}")
+        print(f"DEBUG: stdout: {sys.stdout}")
+        print(f"DEBUG: stderr: {sys.stderr}")
+        
+        # Tentar executar o servidor com timeout
+        import asyncio
+        import signal
+        
+        def signal_handler(signum, frame):
+            print("DEBUG: Received signal, shutting down...")
+            sys.exit(0)
+        
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+        
+        print("DEBUG: Starting server.run() with signal handlers...")
         server.run()
+        
     except Exception as e:
         print(f"ERROR: Failed to start server: {e}")
         print(f"ERROR: Exception type: {type(e)}")
         import traceback
         print(f"ERROR: Traceback: {traceback.format_exc()}")
-        raise 
+        
+        # Em vez de falhar, manter o container rodando
+        print("DEBUG: Keeping container alive for debugging...")
+        import time
+        while True:
+            time.sleep(10)
+            print("DEBUG: Container still alive...") 
