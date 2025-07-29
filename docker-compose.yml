@@ -19,12 +19,13 @@ services:
     ports:
       # Porta para debugging (se necessário)
       - "54321:54321"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:54321/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    # healthcheck (comentado temporariamente para debug)
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:54321/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
     networks:
       - mcp-network
 

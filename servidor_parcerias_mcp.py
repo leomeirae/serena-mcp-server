@@ -302,5 +302,16 @@ async def criar_contrato(id_lead: str, plano: Optional[Dict[str, Any]] = None, r
 
 # Código para executar o servidor
 if __name__ == "__main__":
-    print("Iniciando o Servidor MCP para a API de Parcerias...")
-    server.run() 
+    try:
+        print("Iniciando o Servidor MCP para a API de Parcerias...")
+        print(f"DEBUG: Server object created: {server}")
+        print(f"DEBUG: Server name: {server.name}")
+        print(f"DEBUG: Server instructions: {server.instructions}")
+        print("DEBUG: Starting server.run()...")
+        server.run()
+    except Exception as e:
+        print(f"ERROR: Failed to start server: {e}")
+        print(f"ERROR: Exception type: {type(e)}")
+        import traceback
+        print(f"ERROR: Traceback: {traceback.format_exc()}")
+        raise 

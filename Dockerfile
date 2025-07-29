@@ -41,9 +41,9 @@ USER mcpuser
 # Expor porta (se necessário para debugging)
 EXPOSE 54321
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:54321/health || exit 1
+# Health check (comentado temporariamente para debug)
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:54321/health || exit 1
 
 # Comando padrão
 CMD ["python", "servidor_parcerias_mcp.py"]
