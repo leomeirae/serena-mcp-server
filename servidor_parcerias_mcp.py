@@ -8,12 +8,23 @@ from dotenv import load_dotenv
 # Carrega as variáveis do arquivo .env
 load_dotenv()
 
-# Carregue sua chave de API do arquivo .env
+# Carregue sua chave de API de variáveis de ambiente (prioridade) ou arquivo .env
 API_KEY = os.getenv("PARTNERSHIP_API_KEY")
 API_BASE_URL = os.getenv("PARTNERSHIP_API_ENDPOINT", "https://partnership-service-staging.api.srna.co").rstrip('/')
 
+# Se não encontrou nas variáveis de ambiente, tenta carregar do .env
 if not API_KEY:
-    raise ValueError("A variável PARTNERSHIP_API_KEY não foi definida no arquivo .env")
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+        API_KEY = os.getenv("PARTNERSHIP_API_KEY")
+        if not API_BASE_URL or API_BASE_URL == "https://partnership-service-staging.api.srna.co":
+            API_BASE_URL = os.getenv("PARTNERSHIP_API_ENDPOINT", "https://partnership-service-staging.api.srna.co").rstrip('/')
+    except ImportError:
+        pass
+
+if not API_KEY:
+    raise ValueError("A variável PARTNERSHIP_API_KEY não foi definida. Configure via variável de ambiente ou arquivo .env")
 
 # Função auxiliar para criar os cabeçalhos de autenticação
 def get_auth_headers() -> Dict[str, str]:
