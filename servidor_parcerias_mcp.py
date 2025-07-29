@@ -12,6 +12,9 @@ load_dotenv()
 API_KEY = os.getenv("PARTNERSHIP_API_KEY")
 API_BASE_URL = os.getenv("PARTNERSHIP_API_ENDPOINT", "https://partnership-service-staging.api.srna.co").rstrip('/')
 
+print(f"DEBUG: API_KEY from env: {'SET' if API_KEY else 'NOT SET'}")
+print(f"DEBUG: API_BASE_URL from env: {API_BASE_URL}")
+
 # Se não encontrou nas variáveis de ambiente, tenta carregar do .env
 if not API_KEY:
     try:
@@ -20,11 +23,19 @@ if not API_KEY:
         API_KEY = os.getenv("PARTNERSHIP_API_KEY")
         if not API_BASE_URL or API_BASE_URL == "https://partnership-service-staging.api.srna.co":
             API_BASE_URL = os.getenv("PARTNERSHIP_API_ENDPOINT", "https://partnership-service-staging.api.srna.co").rstrip('/')
+        print(f"DEBUG: After .env load - API_KEY: {'SET' if API_KEY else 'NOT SET'}")
     except ImportError:
+        print("DEBUG: dotenv not available")
         pass
 
+# Fallback hardcoded para Coolify (REMOVER EM PRODUÇÃO)
 if not API_KEY:
-    raise ValueError("A variável PARTNERSHIP_API_KEY não foi definida. Configure via variável de ambiente ou arquivo .env")
+    print("DEBUG: Using hardcoded fallback for Coolify")
+    API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQzNDBmZWEyLWM3ZTQtNGY1Ni1hYjdlLTAyMmE5ZDcwNTBiNiIsInBhcnRuZXJUeXBlIjoicGFydG5lcl9ncm91cCIsImlhdCI6MTc0NDgzNzEzOX0.YvvCD-I4GOSPmRduMoXit8Rw05c9ILoiCjhnPMgygO0"
+    API_BASE_URL = "https://partnership-service-staging.api.srna.co"
+
+print(f"DEBUG: Final API_KEY: {'SET' if API_KEY else 'NOT SET'}")
+print(f"DEBUG: Final API_BASE_URL: {API_BASE_URL}")
 
 # Função auxiliar para criar os cabeçalhos de autenticação
 def get_auth_headers() -> Dict[str, str]:
