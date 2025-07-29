@@ -314,19 +314,44 @@ if __name__ == "__main__":
         print(f"DEBUG: stdout: {sys.stdout}")
         print(f"DEBUG: stderr: {sys.stderr}")
         
-        # Tentar executar o servidor com timeout
-        import asyncio
-        import signal
+        # Criar servidor HTTP simples para expor as ferramentas
+        from fastapi import FastAPI, HTTPException
+        import uvicorn
+        import json
+        from typing import Dict, Any
         
-        def signal_handler(signum, frame):
-            print("DEBUG: Received signal, shutting down...")
-            sys.exit(0)
+        app = FastAPI(title="Serena MCP Server", version="1.0.0")
         
-        signal.signal(signal.SIGTERM, signal_handler)
-        signal.signal(signal.SIGINT, signal_handler)
+        @app.get("/")
+        async def root():
+            return {
+                "message": "Serena MCP Server",
+                "version": "1.0.0",
+                "tools": list(server._tool_manager._tools.keys())
+            }
         
-        print("DEBUG: Starting server.run() with signal handlers...")
-        server.run()
+        @app.get("/health")
+        async def health():
+            return {"status": "healthy", "api_key": "SET" if API_KEY else "NOT SET"}
+        
+        @app.get("/tools")
+        async def list_tools():
+            return {"tools": list(server._tool_manager._tools.keys())}
+        
+        @app.post("/tools/{tool_name}")
+        async def execute_tool(tool_name: str, params: Dict[str, Any] = None):
+            if tool_name not in server._tool_manager._tools:
+                raise HTTPException(status_code=404, detail=f"Tool {tool_name} not found")
+            
+            try:
+                tool = server._tool_manager._tools[tool_name]
+                result = await tool(**params or {})
+                return {"result": result}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+        
+        print("DEBUG: Starting HTTP server on port 54321...")
+        uvicorn.run(app, host="0.0.0.0", port=54321)
         
     except Exception as e:
         print(f"ERROR: Failed to start server: {e}")
