@@ -340,33 +340,25 @@ if __name__ == "__main__":
         
         @app.post("/tools/{tool_name}")
         async def execute_tool(tool_name: str, params: Dict[str, Any] = None):
-            if tool_name not in server._tool_manager._tools:
+            # Mapeamento direto das ferramentas para funções
+            tool_functions = {
+                "consultar_areas_operacao_gd": consultar_areas_operacao_gd,
+                "obter_planos_gd": obter_planos_gd,
+                "cadastrar_lead": cadastrar_lead,
+                "buscar_leads": buscar_leads,
+                "validar_qualificacao_lead": validar_qualificacao_lead,
+                "buscar_lead_por_id": buscar_lead_por_id,
+                "atualizar_lead": atualizar_lead,
+                "atualizar_credenciais_distribuidora": atualizar_credenciais_distribuidora,
+                "criar_contrato": criar_contrato
+            }
+            
+            if tool_name not in tool_functions:
                 raise HTTPException(status_code=404, detail=f"Tool {tool_name} not found")
             
             try:
-                tool = server._tool_manager._tools[tool_name]
-                
-                # Debug: imprimir informações sobre a ferramenta
-                print(f"DEBUG: Tool type: {type(tool)}")
-                print(f"DEBUG: Tool attributes: {dir(tool)}")
-                
-                # Tentar diferentes formas de chamar a ferramenta
-                if hasattr(tool, '__call__'):
-                    result = await tool(**params or {})
-                elif hasattr(tool, 'func'):
-                    result = await tool.func(**params or {})
-                elif hasattr(tool, '_func'):
-                    result = await tool._func(**params or {})
-                elif hasattr(tool, 'call'):
-                    result = await tool.call(**params or {})
-                else:
-                    # Última tentativa: usar asyncio.create_task
-                    import asyncio
-                    if asyncio.iscoroutinefunction(tool):
-                        result = await tool(**params or {})
-                    else:
-                        raise HTTPException(status_code=500, detail=f"Tool is not callable. Type: {type(tool)}")
-                
+                func = tool_functions[tool_name]
+                result = await func(**(params or {}))
                 return {"result": result}
             except Exception as e:
                 print(f"DEBUG: Error executing tool {tool_name}: {e}")
