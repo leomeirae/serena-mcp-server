@@ -345,9 +345,31 @@ if __name__ == "__main__":
             
             try:
                 tool = server._tool_manager._tools[tool_name]
-                result = await tool(**params or {})
+                
+                # Debug: imprimir informações sobre a ferramenta
+                print(f"DEBUG: Tool type: {type(tool)}")
+                print(f"DEBUG: Tool attributes: {dir(tool)}")
+                
+                # Tentar diferentes formas de chamar a ferramenta
+                if hasattr(tool, '__call__'):
+                    result = await tool(**params or {})
+                elif hasattr(tool, 'func'):
+                    result = await tool.func(**params or {})
+                elif hasattr(tool, '_func'):
+                    result = await tool._func(**params or {})
+                elif hasattr(tool, 'call'):
+                    result = await tool.call(**params or {})
+                else:
+                    # Última tentativa: usar asyncio.create_task
+                    import asyncio
+                    if asyncio.iscoroutinefunction(tool):
+                        result = await tool(**params or {})
+                    else:
+                        raise HTTPException(status_code=500, detail=f"Tool is not callable. Type: {type(tool)}")
+                
                 return {"result": result}
             except Exception as e:
+                print(f"DEBUG: Error executing tool {tool_name}: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
         
         print("DEBUG: Starting HTTP server on port 54321...")
