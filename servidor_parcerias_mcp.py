@@ -1,7 +1,6 @@
 # servidor_parcerias_mcp.py
 import os
 import httpx
-from mcp.server import FastMCP
 from typing import Optional, Dict, Any, List
 from dotenv import load_dotenv
 
@@ -44,15 +43,12 @@ def get_auth_headers() -> Dict[str, str]:
         "Content-Type": "application/json"
     }
 
-# Inicializa o servidor MCP
-server = FastMCP(
-    name="servidor_api_parcerias",
-    instructions="Servidor para API de Parcerias da Serena"
-)
+# Configuração do servidor
+SERVER_NAME = "servidor_api_parcerias"
+SERVER_INSTRUCTIONS = "Servidor para API de Parcerias da Serena"
 
 # --- Ferramentas de Geração Distribuída ---
 
-@server.tool()
 async def consultar_areas_operacao_gd(cidade: Optional[str] = None, estado: Optional[str] = None, codigo_ibge: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Retorna uma lista de áreas onde o serviço de Geração Distribuída (GD) está disponível.
@@ -84,7 +80,6 @@ async def consultar_areas_operacao_gd(cidade: Optional[str] = None, estado: Opti
         response.raise_for_status()
         return response.json()
 
-@server.tool()
 async def obter_planos_gd(id_distribuidora: Optional[str] = None, cidade: Optional[str] = None, estado: Optional[str] = None) -> Dict[str, Any]:
     """
     Retorna os planos de Geração Distribuída (GD) disponíveis para uma localidade.
@@ -119,7 +114,6 @@ async def obter_planos_gd(id_distribuidora: Optional[str] = None, cidade: Option
 
 # --- Ferramentas de Conversão de Vendas (Leads) ---
 
-@server.tool()
 async def cadastrar_lead(dados_lead: Dict[str, Any]) -> Dict[str, Any]:
     """
     Cadastra um novo lead na base de dados.
@@ -141,7 +135,6 @@ async def cadastrar_lead(dados_lead: Dict[str, Any]) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json() if response.status_code != 204 else {"status": "success", "statusCode": 204}
 
-@server.tool()
 async def buscar_leads(filtros: Optional[str] = None, pagina: int = 1, limite: int = 10) -> Dict[str, Any]:
     """
     Busca uma lista de leads com base em filtros fornecidos.
@@ -169,7 +162,6 @@ async def buscar_leads(filtros: Optional[str] = None, pagina: int = 1, limite: i
         response.raise_for_status()
         return response.json()
 
-@server.tool()
 async def validar_qualificacao_lead(cidade: str, estado: str, tipo_pessoa: str, valor_conta: float) -> Dict[str, Any]:
     """
     Valida se um lead está qualificado para o produto de geração distribuída ou mercado livre.
@@ -198,7 +190,6 @@ async def validar_qualificacao_lead(cidade: str, estado: str, tipo_pessoa: str, 
         response.raise_for_status()
         return response.json()
         
-@server.tool()
 async def buscar_lead_por_id(id_lead: str) -> Dict[str, Any]:
     """
     Busca as informações de um lead específico cadastrado, baseado no seu ID.
@@ -217,7 +208,6 @@ async def buscar_lead_por_id(id_lead: str) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
 
-@server.tool()
 async def atualizar_lead(id_lead: str, dados_atualizacao: Dict[str, Any]) -> Dict[str, Any]:
     """
     Atualiza as informações do lead de acordo com os dados enviados.
@@ -240,7 +230,6 @@ async def atualizar_lead(id_lead: str, dados_atualizacao: Dict[str, Any]) -> Dic
         response.raise_for_status()
         return response.json() if response.status_code != 204 else {"status": "success", "statusCode": 204}
 
-@server.tool()
 async def atualizar_credenciais_distribuidora(id_lead: str, login: str, senha: str) -> Dict[str, Any]:
     """
     Adicionar ou atualizar o login e a senha da distribuidora.
@@ -268,7 +257,6 @@ async def atualizar_credenciais_distribuidora(id_lead: str, login: str, senha: s
         response.raise_for_status()
         return response.json() if response.status_code != 204 else {"status": "success", "statusCode": 204}
 
-@server.tool()
 async def criar_contrato(id_lead: str, plano: Optional[Dict[str, Any]] = None, representantes_legais: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """
     Cria um contrato de geração distribuída associado a um lead.
@@ -304,9 +292,8 @@ async def criar_contrato(id_lead: str, plano: Optional[Dict[str, Any]] = None, r
 if __name__ == "__main__":
     try:
         print("Iniciando o Servidor MCP para a API de Parcerias...")
-        print(f"DEBUG: Server object created: {server}")
-        print(f"DEBUG: Server name: {server.name}")
-        print(f"DEBUG: Server instructions: {server.instructions}")
+        print(f"DEBUG: Server name: {SERVER_NAME}")
+        print(f"DEBUG: Server instructions: {SERVER_INSTRUCTIONS}")
         
         # Verificar se há conexão stdio disponível
         import sys
@@ -327,7 +314,7 @@ if __name__ == "__main__":
             return {
                 "message": "Serena MCP Server",
                 "version": "1.0.0",
-                "tools": list(server._tool_manager._tools.keys())
+                "tools": ["consultar_areas_operacao_gd", "obter_planos_gd", "cadastrar_lead", "buscar_leads", "validar_qualificacao_lead", "buscar_lead_por_id", "atualizar_lead", "atualizar_credenciais_distribuidora", "criar_contrato"]
             }
         
         @app.get("/health")
@@ -336,7 +323,7 @@ if __name__ == "__main__":
         
         @app.get("/tools")
         async def list_tools():
-            return {"tools": list(server._tool_manager._tools.keys())}
+            return {"tools": ["consultar_areas_operacao_gd", "obter_planos_gd", "cadastrar_lead", "buscar_leads", "validar_qualificacao_lead", "buscar_lead_por_id", "atualizar_lead", "atualizar_credenciais_distribuidora", "criar_contrato"]}
         
         @app.post("/tools/{tool_name}")
         async def execute_tool(tool_name: str, params: Dict[str, Any] = None):
