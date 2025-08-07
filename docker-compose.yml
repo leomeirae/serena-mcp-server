@@ -20,7 +20,7 @@ services:
       # Porta para debugging (se necessário)
       - "54321:54321"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:54321/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:54321/status"]
       interval: 30s
       timeout: 10s
       retries: 3

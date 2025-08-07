@@ -321,6 +321,18 @@ if __name__ == "__main__":
         async def health():
             return {"status": "healthy", "api_key": "SET" if API_KEY else "NOT SET"}
         
+        @app.get("/status")
+        async def get_status():
+            """Retorna o status detalhado do servidor e as ferramentas disponíveis."""
+            return {
+                "serverName": SERVER_NAME,
+                "serverInstructions": SERVER_INSTRUCTIONS,
+                "status": "running",
+                "apiKeySet": bool(API_KEY),
+                "apiBaseUrl": API_BASE_URL,
+                "availableTools": list(tool_functions.keys())
+            }
+        
         @app.get("/tools")
         async def list_tools():
             return {"tools": ["consultar_areas_operacao_gd", "obter_planos_gd", "cadastrar_lead", "buscar_leads", "validar_qualificacao_lead", "buscar_lead_por_id", "atualizar_lead", "atualizar_credenciais_distribuidora", "criar_contrato"]}
