@@ -309,12 +309,24 @@ if __name__ == "__main__":
         
         app = FastAPI(title="Serena MCP Server", version="1.0.0")
         
+        tool_functions = {
+            "consultar_areas_operacao_gd": consultar_areas_operacao_gd,
+            "obter_planos_gd": obter_planos_gd,
+            "cadastrar_lead": cadastrar_lead,
+            "buscar_leads": buscar_leads,
+            "validar_qualificacao_lead": validar_qualificacao_lead,
+            "buscar_lead_por_id": buscar_lead_por_id,
+            "atualizar_lead": atualizar_lead,
+            "atualizar_credenciais_distribuidora": atualizar_credenciais_distribuidora,
+            "criar_contrato": criar_contrato
+        }
+
         @app.get("/")
         async def root():
             return {
                 "message": "Serena MCP Server",
                 "version": "1.0.0",
-                "tools": ["consultar_areas_operacao_gd", "obter_planos_gd", "cadastrar_lead", "buscar_leads", "validar_qualificacao_lead", "buscar_lead_por_id", "atualizar_lead", "atualizar_credenciais_distribuidora", "criar_contrato"]
+                "tools": list(tool_functions.keys())
             }
         
         @app.get("/health")
@@ -335,22 +347,11 @@ if __name__ == "__main__":
         
         @app.get("/tools")
         async def list_tools():
-            return {"tools": ["consultar_areas_operacao_gd", "obter_planos_gd", "cadastrar_lead", "buscar_leads", "validar_qualificacao_lead", "buscar_lead_por_id", "atualizar_lead", "atualizar_credenciais_distribuidora", "criar_contrato"]}
+            return {"tools": list(tool_functions.keys())}
         
         @app.post("/tools/{tool_name}")
         async def execute_tool(tool_name: str, params: Dict[str, Any] = None):
             # Mapeamento direto das ferramentas para funções
-            tool_functions = {
-                "consultar_areas_operacao_gd": consultar_areas_operacao_gd,
-                "obter_planos_gd": obter_planos_gd,
-                "cadastrar_lead": cadastrar_lead,
-                "buscar_leads": buscar_leads,
-                "validar_qualificacao_lead": validar_qualificacao_lead,
-                "buscar_lead_por_id": buscar_lead_por_id,
-                "atualizar_lead": atualizar_lead,
-                "atualizar_credenciais_distribuidora": atualizar_credenciais_distribuidora,
-                "criar_contrato": criar_contrato
-            }
             
             if tool_name not in tool_functions:
                 raise HTTPException(status_code=404, detail=f"Tool {tool_name} not found")
